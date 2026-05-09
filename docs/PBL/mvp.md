@@ -4,7 +4,7 @@
 
 ---
 
-## 🚀 The 4 Pillars of AarogyaRekha
+## The 4 Pillars of AarogyaRekha
 
 ### 1. Smart Ingestion
 * **The "Magic Email":** Get a unique address (e.g., `user123@vitanode.com`) for direct lab results ingestion.

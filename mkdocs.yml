@@ -19,11 +19,15 @@ theme:
 
 nav:
   - Home: index.md
-  - MVP : mvp.md
-  - Team Member 1: 
-      - Overview: member1/index.md
-  - Team Member 2:
-      - Overview: member2/index.md
+  - Project Info:
+      - MVP: pbl/mvp.md
+      - Database Schema: pbl/schema.md
+  - Backend Team: 
+      - Overview: pbl/backend/index.md
+      - Details: pbl/backend/info.md
+  - Frontend Team:
+      - Overview: pbl/frontend/index.md
+      - Details: pbl/frontend/info.md
 
 markdown_extensions:
   - admonition
