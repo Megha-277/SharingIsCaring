@@ -2,42 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://Leo.github.io/JustTry/</loc>
-         <lastmod>2026-05-07</lastmod>
+         <lastmod>2026-05-09</lastmod>
     </url>
     <url>
-         <loc>https://Leo.github.io/JustTry/mvp/</loc>
-         <lastmod>2026-05-07</lastmod>
+         <loc>https://Leo.github.io/JustTry/PBL/mvp/</loc>
+         <lastmod>2026-05-09</lastmod>
     </url>
     <url>
-         <loc>https://Leo.github.io/JustTry/member1/</loc>
-         <lastmod>2026-05-07</lastmod>
+         <loc>https://Leo.github.io/JustTry/PBL/schema/</loc>
+         <lastmod>2026-05-09</lastmod>
     </url>
     <url>
-         <loc>https://Leo.github.io/JustTry/member1/tasks/</loc>
-         <lastmod>2026-05-07</lastmod>
+         <loc>https://Leo.github.io/JustTry/PBL/backend/</loc>
+         <lastmod>2026-05-09</lastmod>
     </url>
     <url>
-         <loc>https://Leo.github.io/JustTry/member2/</loc>
-         <lastmod>2026-05-07</lastmod>
+         <loc>https://Leo.github.io/JustTry/PBL/backend/info/</loc>
+         <lastmod>2026-05-09</lastmod>
     </url>
     <url>
-         <loc>https://Leo.github.io/JustTry/member2/tasks/</loc>
-         <lastmod>2026-05-07</lastmod>
+         <loc>https://Leo.github.io/JustTry/PBL/frontend/</loc>
+         <lastmod>2026-05-09</lastmod>
     </url>
     <url>
-         <loc>https://Leo.github.io/JustTry/member3/</loc>
-         <lastmod>2026-05-07</lastmod>
-    </url>
-    <url>
-         <loc>https://Leo.github.io/JustTry/member3/tasks/</loc>
-         <lastmod>2026-05-07</lastmod>
-    </url>
-    <url>
-         <loc>https://Leo.github.io/JustTry/member4/</loc>
-         <lastmod>2026-05-07</lastmod>
-    </url>
-    <url>
-         <loc>https://Leo.github.io/JustTry/member4/tasks/</loc>
-         <lastmod>2026-05-07</lastmod>
+         <loc>https://Leo.github.io/JustTry/PBL/frontend/info/</loc>
+         <lastmod>2026-05-09</lastmod>
     </url>
 </urlset>
