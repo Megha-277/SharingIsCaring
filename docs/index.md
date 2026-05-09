@@ -15,13 +15,13 @@ We have split the development into two core tracks. Select a track below to view
     ---
     Database schema, API integration, AI Extraction logic, and Security protocols.
     
-    [:octicons-arrow-right-24: Enter Backend Folder](pbl/backend/index.md){ .md-button }
+    [:octicons-arrow-right-24: Enter Backend Folder](PBL/backend/index.md){ .md-button }
 
 -   :material-monitor-dashboard:{ .lg .middle } __Frontend & UI/UX__
     ---
     Patient/Doctor dashboards, Emergency QR views, and "Swipe-to-Verify" interfaces.
     
-    [:octicons-arrow-right-24: Enter Frontend Folder](pbl/frontend/index.md){ .md-button }
+    [:octicons-arrow-right-24: Enter Frontend Folder](PBL/frontend/index.md){ .md-button }
 
 </div>
 
@@ -29,5 +29,5 @@ We have split the development into two core tracks. Select a track below to view
 
 ## 📋 Quick Access
 !!! tip "Core Documents"
-    * [:octicons-goal-24: View MVP Goal](pbl/mvp.md)
-    * [:octicons-database-24: View Database Schema](pbl/schema.md)
+    * [:octicons-goal-24: View MVP Goal](PBL/mvp.md)
+    * [:octicons-database-24: View Database Schema](PBL/schema.md)
