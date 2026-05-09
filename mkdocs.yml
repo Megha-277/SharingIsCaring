@@ -18,16 +18,17 @@ theme:
         name: Switch to light mode
 
 nav:
-  - Home: index.md
-  - Project Info:
-      - MVP: pbl/mvp.md
+  # - Home: index.md
+  - DBMS PBL Project:
+      # - Project Overview: index.md
+      - MVP Goal: pbl/mvp.md
       - Database Schema: pbl/schema.md
-  - Backend Team: 
-      - Overview: pbl/backend/index.md
-      - Details: pbl/backend/info.md
-  - Frontend Team:
-      - Overview: pbl/frontend/index.md
-      - Details: pbl/frontend/info.md
+      - Backend System:
+          - Overview: pbl/backend/index.md
+          - Info: pbl/backend/info.md
+      - Frontend System:
+          - Overview: pbl/frontend/index.md
+          - Info: pbl/frontend/info.md
 
 markdown_extensions:
   - admonition
@@ -37,5 +38,3 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
-  - pymdownx.tabbed:
-      alternate_style: true
