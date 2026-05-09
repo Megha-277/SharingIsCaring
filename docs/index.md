@@ -9,9 +9,11 @@ Welcome! This is a centralized space designed to share project documentation and
 
 ## 📂 Current Projects
 
-!!! 1 DBMS PBL Project
-    ### DBMS PBL Project
-    * [:material-database: **View Database Schema**](pbl/schema.md)
+### DBMS PBL Project
+This section contains the core architectural details for our database management system project.
+
+* [:material-database: **View Database Schema**](pbl/schema.md)
+    *Review table structures, relationships, and constraints directly in your browser.*
 
 ---
-*Lat Updated • 9 May 2026*
+*Developed for the team • 2026*
