@@ -18,17 +18,17 @@ theme:
         name: Switch to light mode
 
 nav:
-  # - Home: index.md
+  - Home: index.md
   - DBMS PBL Project:
       # - Project Overview: index.md
-      - MVP Goal: pbl/mvp.md
+      # - MVP Goal: pbl/mvp.md
       - Database Schema: pbl/schema.md
-      - Backend System:
-          - Overview: pbl/backend/index.md
-          - Info: pbl/backend/info.md
-      - Frontend System:
-          - Overview: pbl/frontend/index.md
-          - Info: pbl/frontend/info.md
+      # - Backend System:
+      #     - Overview: pbl/backend/index.md
+      #     - Info: pbl/backend/info.md
+      # - Frontend System:
+      #     - Overview: pbl/frontend/index.md
+      #     - Info: pbl/frontend/info.md
 
 markdown_extensions:
   - admonition
