@@ -10,9 +10,9 @@ Welcome! This is a centralized space designed to share project documentation and
 ## 📂 Current Projects
 
 !!! 1. 
-### DBMS PBL Project
+    ### DBMS PBL Project
 
-* [:material-database: **View Database Schema**](pbl/schema.md)
+    * [:material-database: **View Database Schema**](pbl/schema.md)
 
 ---
 *Developed for the team • 2026*

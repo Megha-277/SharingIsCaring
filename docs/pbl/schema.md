@@ -164,4 +164,4 @@
 | **Users → Audit_Log (target)** | 1 : N | Partial both sides | One user's account can be the subject of many logged access events. |
 
 
-<iframe src="diagram.html" width="100%" height="500px" frameborder="0"></iframe>
+<iframe src="../diagram.html" width="100%" height="800px" frameborder="0"></iframe>
