@@ -1,137 +1,164 @@
-# Database Schema: AarogyaRekha
+# Database Schema Documentation
 
-This document details the relational database structure for the Health Pulse Digital Twin. 
-
----
-
-## 🏗️ Core User Tables
+## 1. Schema Tables
 
 ### Users
-The central entity for every account in the system.
+**Core entity — every account**
 
 | Column | Type | Constraints | Description |
-| :--- | :--- | :--- | :--- |
-| `user_id` | INT | PK, AI | Primary key, auto-increment |
-| `full_name` | VARCHAR(100) | NOT NULL | User's legal name |
-| `email` | VARCHAR(100) | UNIQUE, NOT NULL | Login identifier |
-| `password_hash` | VARCHAR(255) | NOT NULL | Bcrypt hash |
-| `dob` | DATE | NOT NULL | Date of Birth |
-| `gender` | ENUM | 'male', 'female', 'other' | - |
-| `blood_group` | VARCHAR(5) | Nullable | Stored for fast emergency queries |
-| `is_doctor` | BOOLEAN | DEFAULT FALSE | Privilege flag |
-| `created_at` | TIMESTAMP | DEFAULT CURRENT | Account creation time |
-
-### Patient_Identity
-A 1:1 extension of the Users table for medical profiles.
-
-| Column | Type | Constraints | Description |
-| :--- | :--- | :--- | :--- |
-| `identity_id` | INT | PK, AI | Primary key |
-| `user_id` | INT | FK, UNIQUE, NOT NULL | Link to `Users(user_id)` (Cascade) |
-| `allergies` | TEXT | Nullable | Known allergies |
-| `current_medications` | TEXT | Nullable | Active meds |
-| `emergency_contact_name` | VARCHAR(100) | Nullable | - |
-| `emergency_contact_phone`| VARCHAR(15) | Nullable | - |
+|:---|:---|:---|:---|
+| `user_id` | INT AI | **PK** | Primary key |
+| `full_name` | VARCHAR(100) | NOT NULL | |
+| `email` | VARCHAR(100) | UNIQUE NOT NULL | |
+| `password_hash` | VARCHAR(255) | NOT NULL | bcrypt hash |
+| `dob` | DATE | NOT NULL | |
+| `gender` | ENUM | 'male','female','other' | |
+| `blood_group` | VARCHAR(5) | Nullable | Stored here for fast emergency queries |
+| `is_doctor` | BOOLEAN | DEFAULT FALSE | Privilege flag, not a separate role table |
+| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | |
 
 ---
 
-## 📊 Medical Data Structures
+### Patient_Identity
+**1:1 extension of Users**
+
+| Column | Type | Constraints | Description |
+|:---|:---|:---|:---|
+| `identity_id` | INT AI | **PK** | Primary key |
+| `user_id` | INT | **FK**, UNIQUE NOT NULL | → `Users(user_id)` ON DELETE CASCADE |
+| `allergies` | TEXT | Nullable | |
+| `current_medications` | TEXT | Nullable | |
+| `emergency_contact_name` | VARCHAR(100) | Nullable | |
+| `emergency_contact_phone`| VARCHAR(15) | Nullable | |
+
+---
+
+### Family_Access
+**M:N self-join on Users**
+
+| Column | Type | Constraints | Description |
+|:---|:---|:---|:---|
+| `family_access_id` | INT AI | **PK** | Primary key |
+| `owner_user_id` | INT | **FK**, NOT NULL | → `Users(user_id)` ON DELETE CASCADE |
+| `member_user_id` | INT | **FK**, NOT NULL | → `Users(user_id)` ON DELETE CASCADE |
+| `relation` | ENUM | NOT NULL | 'parent','child','spouse','sibling','other' |
+| `can_manage` | BOOLEAN | DEFAULT TRUE | |
+| `granted_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | |
+| `(owner, member)` | UNIQUE KEY | **UQ** | Prevents duplicate access pairs |
+
+---
 
 ### Medical_Records
-The central fact table for all uploaded documents.
+**Central fact table**
 
 | Column | Type | Constraints | Description |
-| :--- | :--- | :--- | :--- |
-| `record_id` | INT | PK, AI | Primary key |
-| `user_id` | INT | FK, NOT NULL | Record owner (Cascade) |
-| `uploaded_by_user_id` | INT | FK | Uploader (SET NULL on delete) |
-| `record_type` | ENUM | NOT NULL | 'lab_report', 'prescription', 'clinical_note' |
-| `title` | VARCHAR(200) | Nullable | - |
+|:---|:---|:---|:---|
+| `record_id` | INT AI | **PK** | Primary key |
+| `user_id` | INT | **FK**, NOT NULL | → `Users(user_id)` ON DELETE CASCADE (owner) |
+| `uploaded_by_user_id` | INT | **FK** | → `Users(user_id)` ON DELETE SET NULL |
+| `record_type` | ENUM | NOT NULL | 'lab_report','prescription','clinical_note' |
+| `title` | VARCHAR(200) | Nullable | |
 | `doctor_name` | VARCHAR(100) | Nullable | Denormalized for PBL scope |
-| `hospital_name` | VARCHAR(100) | Nullable | - |
-| `record_date` | DATE | NOT NULL | Date on the document |
-| `file_path` | VARCHAR(255) | Nullable | Path to PDF/Image |
-| `file_mime_type` | VARCHAR(50) | Nullable | e.g. 'application/pdf' |
-| `notes` | TEXT | Nullable | - |
+| `hospital_name` | VARCHAR(100) | Nullable | |
+| `record_date` | DATE | NOT NULL | |
+| `file_path` | VARCHAR(255) | Nullable | Path to uploaded PDF/image |
+| `file_mime_type` | VARCHAR(50) | Nullable | e.g. 'application/pdf', 'image/jpeg' |
+| `notes` | TEXT | Nullable | |
+| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | |
 
-> **Indices:** `record_date` (Timeline sort), `record_type` (Filter), `(user_id, record_date)` (Composite)
+**Indexes:**
+* **IDX**: `record_date` — INDEX for timeline sort
+* **IDX**: `record_type` — INDEX for category filter
+* **IDX**: `(user_id, record_date)` — COMPOSITE INDEX — primary query pattern
+
+---
 
 ### Test_Results
-Detailed numeric values extracted from lab reports.
+**Child of Medical_Records**
 
 | Column | Type | Constraints | Description |
-| :--- | :--- | :--- | :--- |
-| `test_id` | INT | PK, AI | Primary key |
-| `record_id` | INT | FK, NOT NULL | Link to `Medical_Records` (Cascade) |
-| `test_name` | VARCHAR(100) | NOT NULL | e.g. Glucose, TSH |
-| `test_value` | DECIMAL(12,4) | NOT NULL | Supports high precision |
-| `unit` | VARCHAR(20) | Nullable | e.g. mg/dL |
-| `normal_min` | DECIMAL(12,4) | Nullable | Reference range low |
-| `normal_max` | DECIMAL(12,4) | Nullable | Reference range high |
+|:---|:---|:---|:---|
+| `test_id` | INT AI | **PK** | Primary key |
+| `record_id` | INT | **FK**, NOT NULL | → `Medical_Records(record_id)` ON DELETE CASCADE |
+| `test_name` | VARCHAR(100) | NOT NULL | |
+| `test_value` | DECIMAL(12,4) | | Supports low-precision values like TSH |
+| `unit` | VARCHAR(20) | Nullable | e.g. mg/dL, IU/L |
+| `normal_min` | DECIMAL(12,4) | Nullable | |
+| `normal_max` | DECIMAL(12,4) | Nullable | |
+
+**Indexes:**
+* **IDX**: `test_name` — INDEX for search by test name
+
+---
 
 ### Prescriptions
-Medicine details linked to prescription records.
+**Child of Medical_Records**
 
 | Column | Type | Constraints | Description |
-| :--- | :--- | :--- | :--- |
-| `prescription_id` | INT | PK, AI | Primary key |
-| `record_id` | INT | FK, NOT NULL | Link to `Medical_Records` (Cascade) |
-| `medicine_name` | VARCHAR(100) | NOT NULL | - |
+|:---|:---|:---|:---|
+| `prescription_id` | INT AI | **PK** | Primary key |
+| `record_id` | INT | **FK**, NOT NULL | → `Medical_Records(record_id)` ON DELETE CASCADE |
+| `medicine_name` | VARCHAR(100) | NOT NULL | |
 | `dosage` | VARCHAR(100) | Nullable | e.g. 500mg twice daily |
 | `duration` | VARCHAR(50) | Nullable | e.g. 7 days |
 
 ---
 
-## 🔐 Access, Family, & Audit
-
-### Family_Access
-Self-join table for managing family permissions.
-
-| Column | Type | Constraints | Description |
-| :--- | :--- | :--- | :--- |
-| `family_access_id` | INT | PK, AI | - |
-| `owner_user_id` | INT | FK, NOT NULL | The user granting access |
-| `member_user_id` | INT | FK, NOT NULL | The user receiving access |
-| `relation` | ENUM | NOT NULL | 'parent', 'child', 'spouse', etc. |
-| `can_manage` | BOOLEAN | DEFAULT TRUE | - |
-| `granted_at` | DATETIME | DEFAULT CURRENT | - |
-
 ### Doctor_Access_Requests
-Workflow for temporary record sharing.
+**Access workflow with expiry**
 
 | Column | Type | Constraints | Description |
-| :--- | :--- | :--- | :--- |
-| `request_id` | INT | PK, AI | - |
-| `doctor_user_id` | INT | FK, NOT NULL | Link to `Users` (Cascade) |
-| `patient_user_id` | INT | FK, NOT NULL | Link to `Users` (Cascade) |
-| `status` | ENUM | DEFAULT 'pending'| 'pending', 'approved', 'rejected', 'expired' |
-| `expires_at` | DATETIME | Nullable | Set upon approval |
-| `approved_by_user_id`| INT | FK | Approving caregiver/patient |
-
-### Audit_Log
-Append-only trail for security and compliance.
-
-| Column | Type | Constraints | Description |
-| :--- | :--- | :--- | :--- |
-| `log_id` | INT | PK, AI | - |
-| `actor_user_id` | INT | FK, NOT NULL | Who performed action |
-| `target_user_id` | INT | FK, NOT NULL | Subject of the action |
-| `action` | ENUM | NOT NULL | 'view', 'upload', 'edit', 'delete', 'share' |
-| `record_id` | INT | Nullable | Specific record affected |
-| `logged_at` | TIMESTAMP | DEFAULT CURRENT | - |
+|:---|:---|:---|:---|
+| `request_id` | INT AI | **PK** | Primary key |
+| `doctor_user_id` | INT | **FK**, NOT NULL | → `Users(user_id)` ON DELETE CASCADE |
+| `patient_user_id` | INT | **FK**, NOT NULL | → `Users(user_id)` ON DELETE CASCADE |
+| `request_message` | TEXT | Nullable | |
+| `status` | ENUM | DEFAULT 'pending' | 'pending','approved','rejected','expired' |
+| `requested_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | |
+| `expires_at` | DATETIME | Nullable | NULL until approved; set on approval |
+| `approved_by_user_id` | INT | **FK** | → `Users(user_id)` ON DELETE SET NULL (approver) |
 
 ---
 
-## 🔗 Relationships & Cardinality
+### Audit_Log
+**Append-only access trail**
+
+| Column | Type | Constraints | Description |
+|:---|:---|:---|:---|
+| `log_id` | INT AI | **PK** | Primary key |
+| `actor_user_id` | INT | **FK**, NOT NULL | → `Users(user_id)` — who performed action |
+| `target_user_id` | INT | **FK**, NOT NULL | → `Users(user_id)` — whose records were accessed |
+| `action` | ENUM | NOT NULL | 'view','upload','edit','delete','share' |
+| `record_id` | INT | Nullable | Specific record; NULL for account-level actions |
+| `logged_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | |
+
+**Indexes:**
+* **IDX**: `(target_user_id, logged_at)` — COMPOSITE INDEX — "who accessed my records" query
+
+---
+
+## 2. Relationship Cardinality & Participation
+
+### Legend
+* **PK** — Primary Key
+* **FK** — Foreign Key
+* **IDX / UQ** — Index or Unique Constraint
+* **M:N** — Many-to-Many
+* **1:N** — One-to-Many
+* **1:1** — One-to-One
+
+### Cardinality Table
 
 | Entities | Ratio | Participation | Meaning |
-| :--- | :--- | :--- | :--- |
-| **Users → Identity** | 1 : 1 | Total (ID), Partial (User) | Every ID must have a user; users might not have IDs yet. |
-| **Users → Records** | 1 : N | Partial / Partial | One user owns zero or many records. |
-| **Records → Tests** | 1 : N | Partial / Partial | Lab reports have many test values; notes have none. |
-| **Users ↔ Users** | M : N | Partial / Partial | Junction table for family management (Self-join). |
-| **Users → Doctor Req**| 1 : N | Partial / Partial | Doctors send many; Patients receive many. |
-| **Users → Audit Log** | 1 : N | Partial / Partial | Tracks actors (who) and targets (whose data). |
-
-!!! info "Key"
-    **PK**: Primary Key | **FK**: Foreign Key | **IDX**: Index | **UQ**: Unique | **AI**: Auto-Increment
+|:---|:---|:---|:---|
+| **Users → Patient_Identity** | 1 : 1 | Total (Identity), Partial (Users) | Every identity record must belong to exactly one user. A user may or may not have created their identity record yet. |
+| **Users → Medical_Records (owner)** | 1 : N | Partial both sides | One user can own zero or many medical records. Each record belongs to exactly one user. |
+| **Users → Medical_Records (uploader)** | 1 : N | Partial both sides | One user (doctor/caregiver) can upload zero or many records. Nullable — SET NULL on delete. |
+| **Medical_Records → Test_Results** | 1 : N | Partial both sides | One lab record can contain many test values. Not all records have test results. |
+| **Medical_Records → Prescriptions** | 1 : N | Partial both sides | One prescription record can list many medicines. Only 'prescription' type uses this. |
+| **Users ↔ Users (Family_Access)** | M : N | Partial both sides | Junction table for self-join. A user can grant/receive access to many others. |
+| **Users → Requests (doctor)** | 1 : N | Partial both sides | One doctor (is_doctor = TRUE) can send many access requests. |
+| **Users → Requests (patient)** | 1 : N | Partial both sides | One patient can receive many access requests from different doctors. |
+| **Users → Requests (approver)** | 1 : N | Partial both sides | One user (patient/caregiver) can approve many requests. Nullable until approved. |
+| **Users → Audit_Log (actor)** | 1 : N | Partial both sides | One user can perform many logged actions. |
+| **Users → Audit_Log (target)** | 1 : N | Partial both sides | One user's account can be the subject of many logged access events. |
