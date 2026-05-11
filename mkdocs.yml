@@ -1,5 +1,6 @@
 site_name: SharingIsCaring
-site_url: https://Megha-277.github.io/SharingIsCaring/
+site_url: https://megha-277.github.io/SharingIsCaring/
+use_directory_urls: true
 
 theme:
   name: material
