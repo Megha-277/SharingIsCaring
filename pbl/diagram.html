@@ -1,0 +1,161 @@
+
+<style>
+#erd-wrap { padding: 1rem 0; }
+#erd svg { display: block; }
+.merm-loading { color: var(--color-text-secondary); font-size: 14px; padding: 2rem; text-align: center; }
+</style>
+<div id="erd-wrap"><div class="merm-loading">Rendering diagram…</div></div>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Anthropic Sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '13px',
+    fontFamily: '"Anthropic Sans", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+    primaryColor: dark ? '#3C3489' : '#EEEDFE',
+    primaryTextColor: dark ? '#CECBF6' : '#26215C',
+    primaryBorderColor: dark ? '#7F77DD' : '#534AB7',
+    secondaryColor: dark ? '#085041' : '#E1F5EE',
+    secondaryTextColor: dark ? '#9FE1CB' : '#04342C',
+    secondaryBorderColor: dark ? '#1D9E75' : '#0F6E56',
+    tertiaryColor: dark ? '#3b6d11' : '#EAF3DE',
+    tertiaryTextColor: dark ? '#C0DD97' : '#173404',
+    tertiaryBorderColor: dark ? '#639922' : '#3B6D11',
+  },
+});
+const diagram = `erDiagram
+  USERS {
+    int user_id PK
+    varchar full_name
+    varchar email
+    varchar password_hash
+    date dob
+    enum gender
+    varchar blood_group
+    boolean is_doctor
+    timestamp created_at
+  }
+
+  PATIENT_IDENTITY {
+    int identity_id PK
+    int user_id FK
+    text allergies
+    text current_medications
+    varchar emergency_contact_name
+    varchar emergency_contact_phone
+  }
+
+  FAMILY_ACCESS {
+    int family_access_id PK
+    int owner_user_id FK
+    int member_user_id FK
+    enum relation
+    boolean can_manage
+    datetime granted_at
+  }
+
+  MEDICAL_RECORDS {
+    int record_id PK
+    int user_id FK
+    int uploaded_by_user_id FK
+    enum record_type
+    varchar title
+    varchar doctor_name
+    varchar hospital_name
+    date record_date
+    varchar file_path
+    varchar file_mime_type
+    text notes
+    timestamp created_at
+  }
+
+  TEST_RESULTS {
+    int test_id PK
+    int record_id FK
+    varchar test_name
+    decimal test_value
+    varchar unit
+    decimal normal_min
+    decimal normal_max
+  }
+
+  PRESCRIPTIONS {
+    int prescription_id PK
+    int record_id FK
+    varchar medicine_name
+    varchar dosage
+    varchar duration
+  }
+
+  DOCTOR_ACCESS_REQUESTS {
+    int request_id PK
+    int doctor_user_id FK
+    int patient_user_id FK
+    text request_message
+    enum status
+    datetime requested_at
+    datetime expires_at
+    int approved_by_user_id FK
+  }
+
+  AUDIT_LOG {
+    int log_id PK
+    int actor_user_id FK
+    int target_user_id FK
+    enum action
+    int record_id
+    timestamp logged_at
+  }
+
+  USERS ||--|| PATIENT_IDENTITY : "has identity"
+  USERS ||--o{ MEDICAL_RECORDS : "owns records"
+  USERS ||--o{ MEDICAL_RECORDS : "uploaded by"
+  USERS ||--o{ FAMILY_ACCESS : "grants access"
+  USERS ||--o{ FAMILY_ACCESS : "receives access"
+  USERS ||--o{ DOCTOR_ACCESS_REQUESTS : "requests as doctor"
+  USERS ||--o{ DOCTOR_ACCESS_REQUESTS : "receives as patient"
+  USERS ||--o{ DOCTOR_ACCESS_REQUESTS : "approved by"
+  USERS ||--o{ AUDIT_LOG : "actor"
+  USERS ||--o{ AUDIT_LOG : "target"
+  MEDICAL_RECORDS ||--o{ TEST_RESULTS : "has test data"
+  MEDICAL_RECORDS ||--o{ PRESCRIPTIONS : "has medicines"
+`;
+const wrap = document.getElementById('erd-wrap');
+try {
+  const { svg } = await mermaid.render('erd-main', diagram);
+  wrap.innerHTML = svg;
+
+  wrap.querySelectorAll('svg .node').forEach(node => {
+    const firstPath = node.querySelector('path[d]');
+    if (!firstPath) return;
+    const d = firstPath.getAttribute('d');
+    const nums = d.match(/-?[\d.]+/g)?.map(Number);
+    if (!nums || nums.length < 8) return;
+    const xs = [nums[0], nums[2], nums[4], nums[6]];
+    const ys = [nums[1], nums[3], nums[5], nums[7]];
+    const x = Math.min(...xs), y = Math.min(...ys);
+    const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', x); rect.setAttribute('y', y);
+    rect.setAttribute('width', w); rect.setAttribute('height', h);
+    rect.setAttribute('rx', '8');
+    for (const a of ['fill', 'stroke', 'stroke-width', 'class', 'style']) {
+      if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+    }
+    firstPath.replaceWith(rect);
+  });
+
+  wrap.querySelectorAll('svg .row-rect-odd path, svg .row-rect-even path').forEach(p => {
+    p.setAttribute('stroke', 'none');
+  });
+} catch(e) {
+  wrap.innerHTML = '<div class="merm-loading">Could not render diagram. ' + e.message + '</div>';
+}
+</script>
